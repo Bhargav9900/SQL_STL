@@ -1,0 +1,432 @@
+
+connect sys as sysdba
+
+connect hr/hr
+
+
+select first_name as name, salary, salary*12 as "Annual" from employees;
+
+select first_name || ' ' || last_name as "Full Name" from employees;
+
+select first_name || ' is a ' || job_id AS "employee and it's job" from employees;
+
+select department_name || q'[ Department's Manager Id: ]' || manager_id AS "Department and Manager" from departments;
+
+
+select department_name || q'$ Department's Manager Id: $' || manager_id AS "Department and Manager" from departments;
+
+select department_name || q'! Department's Manager Id: !' || manager_id AS "Department and Manager" from departments;
+
+select distinct job_id from employees;
+
+select employee_id,last_name,department_id from employees where department_id=10;
+
+select employee_id,last_name from employees where job_id = 'SH_CLERK';
+
+select employee_id,last_name from employees where hire_date = '07-JUN-02';
+
+select employee_id,first_name,salary from employees where salary >= 5000;
+
+select employee_id,first_name,salary from employees where salary <> 5000;
+
+select employee_id,first_name,salary from employees where salary between 5000 and 6000;
+
+select employee_id,first_name,salary from employees where salary in (8000,3000,5000);
+
+select employee_id,first_name,salary from employees where first_name like 'S%';
+
+select employee_id,first_name,salary from employees where first_name like '___';
+
+select employee_id,first_name,salary from employees where first_name like '_e%';
+
+select employee_id,first_name,salary from employees where commission_pct IS NULL;
+
+select employee_id,first_name,salary from employees where salary >= 6000 AND commission_pct IS NULL;
+
+select first_name,job_id,salary from employees where (job_id = 'SA_REP' OR job_id = 'AD_PRSE') AND salary > 5000;
+
+
+
+select employee_id, first_name,salary from employees order by salary;
+
+
+
+
+select employee_id, first_name,salary from employees order by salary ,first_name DESC;
+
+
+select employee_id,last_name,salary,job_id,department_id from employees order by department_id,last_name;
+
+
+select first_name as name, salary, salary*12 as "Annual" from employees ORDER BY "Annual";
+
+select min(hire_date),max(hire_date) from employees;
+
+select count(commission_pct) from employees;
+
+select employee_id,last_name from employees where department_id is null;
+
+select count(distinct department_id) from employees;
+
+select AVG(NVL(commission_pct,0)) from employees;
+NVL take two parameter first is colmun name and second is for which value we have to replace null here null replace with 0
+
+select AVG(NVL(commission_pct,1)) from employees;
+
+
+
+
+
+SELECT COUNT(*) AS No_of_Emp,department_id FROM employees GROUP BY department_id;
+
+SELECT COUNT(*) AS No_of_Emp,department_id FROM employees GROUP BY department_id order by department_id DESC;
+
+select department_id,max(salary) from employees group by department_id;
+
+select max(salary) from employees group by department_id;
+
+select department_id,job_id,sum(salary) from employees group by department_id,job_id order by department_id;
+
+select department_id,AVG(salary) from employees group by department_id;
+
+select department_id,AVG(salary) from employees group by department_id having AVG(salary) > 7000;
+
+select department_id,AVG(salary) from employees group by department_id having AVG(salary) > 7000 order by department_id;
+
+select department_id,AVG(salary) from employees group by department_id having AVG(salary) > 7000 order by AVG(salary);
+
+
+select department_id,AVG(salary) as AVG_Salary from employees group by department_id having AVG(salary) > 7000 order by AVG(salary);
+
+select department_id,AVG(salary) as AVG_Salary from employees group by department_id having AVG(salary) > 7000 order by AVG_Salary;
+
+
+
+create table product(id number(4) primary key, name varchar2(30) not null, brand varchar2(25), price number(12,2));
+
+
+into product (id,name,brand) values (3002,'Lapto','Dell');
+
+insert into product values(3003,'laptop',NULL,29569.87);
+
+
+insert into product values(3004,'Phone',30000.00);
+
+insert into product (id,name,brand,price) values (&pid,'&pname','&pbrand',&price);
+
+
+create table shop_product(id number(4) primary key, name varchar2(30) not null, brand varchar2(25), price number(12,2));
+
+
+flase condition
+copy only table structure
+
+create table my_pro1 as select * from product where 1 =2;
+
+
+update product set brand = 'LG'  , price = price + 10000.00 where id=3001;
+
+update product set price = 9999.50 where price is null;
+
+delect my_pro;
+
+
+set serveroutput on
+
+DECLARE
+	v_name varchar2(20);
+BEGIN
+	select first_name into v_name
+	from employees
+	where employee_id=100;
+	DBMS_OUTPUT.PUT_LINE('First Name is ' || v_name);
+	
+END;
+/
+
+
+DECLARE
+	v_sal number(12,2);
+	v_empno number(5) NOT NULL := 16119;
+	v_location varchar2(15) := 'New York';
+	v_hiredate DATE;
+	c_commission CONSTANT NUMBER := 800;
+BEGIN
+	DBMS_OUTPUT.PUT_LINE('Salary is ' || v_sal);
+	DBMS_OUTPUT.PUT_LINE('EMP ID is ' || v_empno);
+	DBMS_OUTPUT.PUT_LINE('LOCATION is ' || v_location);
+	DBMS_OUTPUT.PUT_LINE('Hdate is ' || v_hiredate);
+	DBMS_OUTPUT.PUT_LINE('commission is ' || c_commission);
+	
+END;
+/
+
+DECLARE
+	v_isPassed BOOLEAN := FALSE;
+BEGIN
+	v_isPassed := TRUE;
+	--DBMS_OUTPUT.PUT_LINE(v_isPassed);
+	
+END;
+/
+
+we can't print boolean value so we comment it with --
+
+------Bind variable in PL/SQL-------------
+
+VARIABLE b_name VARCHAR2(20)
+
+BEGIN
+	SELECT first_name
+	INTO :b_name
+	FROM employees WHERE employee_id = 100;
+END;
+/
+
+PRINT b_name;
+
+
+------------Nestef PL/SQL Block------------
+
+--outer PL/SQL Block
+DECLARE
+	v_outer NUMBER;
+BEGIN
+	v_outer := 10;
+	--inner PL/SQL Block
+	
+	DECLARE
+		v_inner NUMBER;
+	BEGIN
+		v_inner:=20;
+		dbms_output.put_line('Inner var'|| v_inner);
+		dbms_output.put_line('Outer var'|| v_outer);
+		
+	END;
+	
+	dbms_output.put_line('Outer var'|| v_outer);
+END;
+/
+
+
+DECLARE
+	v_rollNo NUMBER := 10;--outer block var
+	
+BEGIN
+	DECLARE
+		v_rollNo NUMBER := 20; --Inner block
+		
+	BEGIN
+		dbms_output.put_line('Inner roll' || v_rollNo);
+	END;
+	dbms_output.put_line('Outer roll' || v_rollNo);
+END;
+/
+
+
+-----block label as qualifier----------
+BEGIN <<outer>>
+DECLARE
+	v_rollNo NUMBER := 10;--outer block var
+	
+BEGIN
+	DECLARE
+		v_rollNo NUMBER := 20; --Inner block
+		
+	BEGIN
+		dbms_output.put_line('Inner roll' || v_rollNo);
+	END;
+	dbms_output.put_line('Outer roll' || v_rollNo);
+END;
+
+END outer;
+/
+
+---------%type-------------
+
+DECLARE
+	v_sal employees.salary%TYPE := 7865.09;
+	v_empno employees.employee_id%TYPE NOT NULL := 16119;
+	v_location locations.city%TYPE := 'New York';
+	v_hiredate employees.hire_date%TYPE;
+	c_commission CONSTANT employees.commission_pct%TYPE := 0.9;
+BEGIN
+	DBMS_OUTPUT.PUT_LINE('Salary is ' || v_sal);
+	DBMS_OUTPUT.PUT_LINE('EMP ID is ' || v_empno);
+	DBMS_OUTPUT.PUT_LINE('LOCATION is ' || v_location);
+	DBMS_OUTPUT.PUT_LINE('Hdate is ' || v_hiredate);
+	DBMS_OUTPUT.PUT_LINE('commission is ' || c_commission);
+	
+END;
+/
+
+
+
+DECLARE
+	v_sal employees.salary%TYPE;
+	v_empno employees.employee_id%TYPE;
+	v_first_name  employees.first_name%TYPE;
+	v_dept_no  employees.department_id%TYPE;
+BEGIN
+
+	SELECT employee_id,first_name,salary,department_id INTO v_empno,v_first_name,v_sal,v_dept_no FROM employees WHERE employee_id=200;
+	DBMS_OUTPUT.PUT_LINE('Salary is ' || v_sal);
+	DBMS_OUTPUT.PUT_LINE('EMP ID is ' || v_empno);
+	DBMS_OUTPUT.PUT_LINE('EMP Name is ' || v_first_name);
+	DBMS_OUTPUT.PUT_LINE('EMP DEPT is ' || v_dept_no);
+	
+END;
+/
+
+
+
+BEGIN
+	insert into product (id,name,brand,price) values(3008,'laptop','Sony',68000.00);
+END;
+/
+
+
+DECLARE
+	v_price_up product.price%type :=200;
+BEGIN
+	UPDATE product
+	SET price = price || v_price_up
+	where id=3008;
+END;
+/
+
+
+DECLARE
+	v_vage NUMBER := 20;
+BEGIN
+	IF v_vage > 18 THEN
+		DBMS_OUTPUT.PUT_LINE('Welcome');
+	ELSE
+		DBMS_OUTPUT.PUT_LINE('Not');
+	END IF;
+END;
+/
+
+DECLARE
+	v_cage NUMBER(2,1) := &age;
+	
+BEGIN
+	IF v_cage >= 3 AND v_cage<4 THEN
+		DBMS_OUTPUT.PUT_LINE('ADmission to nurseryu');
+	
+	ELSIF v_cage >=4 AND v_cage < 5 THEN
+		DBMS_OUTPUT.PUT_LINE('ADmission to JR. KG');
+	ELSIF v_cage >=5 AND v_cage < 6 THEN
+		DBMS_OUTPUT.PUT_LINE('ADmission to SR. KG');
+	ELSE 
+		DBMS_OUTPUT.PUT_LINE('Sorry');
+	END IF;
+END;
+
+
+
+DECLARE
+	v_grade CHAR(1) := UPPER('&grade');
+	v_appr VARCHAR(20);
+	
+BEGIN
+	v_appr := CASE v_grade
+		WHEN 'A' THEN 'EXcellent'
+		WHEN 'B' THEN 'VEry good'
+		WHEN 'C' THEN 'GOod'
+		ELSE 'No such Grade'
+	END;
+	DBMS_OUTPUT.PUT_LINE('Grade: ' || v_grade);
+	DBMS_OUTPUT.PUT_LINE('Appraisal: ' || v_appr);
+END;
+/
+
+
+DECLARE
+	v_weekday VARCHAR2(20):= LOWER('&day');
+BEGIN
+	CASE v_weekday
+		WHEN 'monday' THEN 
+			DBMS_OUTPUT.PUT_LINE('Meeting');
+		WHEN 'tuesday' THEN
+			DBMS_OUTPUT.PUT_LINE('Call to client');
+		WHEN 'wednesday' THEN
+			DBMS_OUTPUT.PUT_LINE('Call to friend');
+			
+			
+			
+BASIC LOOP:-
+DECLARE
+	v_c NUMBER;
+	
+BEGIN
+	v_c :=1;
+	LOOP
+		DBMS_OUTPUT.PUT_LINE('b is max');
+		v_c:=v_c+1;
+		EXIT WHEN v_c >5;
+	END LOOP;
+	
+END;
+/
+
+WHILE LOOP_>
+DECLARE
+	v_c NUMBER;
+	
+BEGIN
+	v_c :=1;
+	WHILE v_c <= 5 LOOP
+		DBMS_OUTPUT.PUT_LINE('v_c is '||v_c);
+		v_c:=v_c+1;
+	END LOOP;
+	
+END;
+/
+
+DECLARE
+	
+FOR LOOP->	
+BEGIN
+	FOR v_c IN 1..5 LOOP
+		DBMS_OUTPUT.PUT_LINE('v_c is '||v_c);
+	END LOOP;
+	
+	DBMS_OUTPUT.PUT_LINE('REVERSE');
+	
+	FOR v_c IN REVERSE 1..5 LOOP
+		DBMS_OUTPUT.PUT_LINE(v_c);
+	END LOOP;
+	
+END;
+/
+		
+		
+		
+------Procedure---------
+
+CREATE OR REPLACE PROCEDURE update_price(p_id product.id%type,new_price number)
+AS
+BEGIN
+
+	UPDATE product
+	SET price = price + new_price
+	WHERE id = p_id;
+END;
+/
+
+---Execute procedure---
+EXEC update_price(3008,90.00);
+
+---PL/SQL Function----
+
+CREATE or REPLACE FUNCTION get_annual_sal(p_sal number)
+RETURN number
+AS
+BEGIN
+	return p_sal * 12;
+END;
+/		
+
+
+select employee_id,first_name,salary,get_annual_sal(salary) from employees;

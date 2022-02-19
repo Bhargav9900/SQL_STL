@@ -1,0 +1,123 @@
+sudo su -l postgres
+psql
+
+\l----list of all db
+create database mydb;
+
+psql mydb
+
+\c mydb
+switch database
+
+select current_date;
+
+\h help
+\q quit
+
+
+
+create table product(
+	id integer primary key,
+	name varchar(30) not null,
+	brand varchar(30) not null,
+	price numeric(20,2));
+	
+\dt or \dt+
+list all the table	
+	
+	
+\d product
+\d+ product
+==>discribe schema<==	
+
+insert into product values(3003,'laptop','DELL',29569.87);
+	
+select * from product;
+
+select name,price from product;	
+
+savepoint A	
+select * from  product order by price desc limit 2;
+
+select * from  product order by price desc limit 2 offset 2;
+
+select * from  product order by price desc limit 2 offset -2;
+
+rollback to savepoint A;
+UPDATE product set price = price + 1000.00 where brand like 'D%';
+
+UPDATE product set price = price + 1000.00 where brand like 'D%' returning *;
+
+delete from product where price < 40000.00 returning *;
+
+\i 'path.sql'
+includ csv in current table
+
+
+DO
+$$
+DECLARE
+	v_name varchar;
+	v_price int;
+BEGIN
+	SELECT name,price
+	INTO v_name,v_price
+	FROM product
+	WHERE id = 3001;
+	RAISE NOTICE 'NAME: %',v_name;
+	RAISE NOTICE 'price: %',v_price;
+	
+END;
+$$ LANGUAGE plpgsql;
+
+
+-----procedure----
+CREATE OR REPLACE PROCEDURE update_pr(p_id int,p_price int)
+LANGUAGE plpgsql
+AS $$
+BEGIN
+	--updateing pro
+	UPDATE product SET
+	price = p_price 
+	WHERE id = p_id;
+END;
+$$;
+
+
+----calling stored procedure----
+CALL update_pr(3001,20000);
+
+----function----
+
+CREATE OR REPLACE FUNCTION inc_pri(p_pri product.price%type)
+RETURNS NUMERIC
+LANGUAGE plpgsql
+AS $$
+BEGIN
+	return p_pri + 500.00;
+END;
+$$;
+
+--calling function---
+select name,inc_pri(price) from product;
+	
+
+
+====>valid not to pass para work <===
+CREATE OR REPLACE FUNCTION inc_pri()
+RETURNS NUMERIC
+LANGUAGE plpgsql
+AS $$
+BEGIN
+	return 500.00;
+END;
+$$;
+
+
+
+
+ALTER USER postgres WITH PASSWORD 'postgres';
+
+
+
+	
